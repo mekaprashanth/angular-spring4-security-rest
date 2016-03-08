@@ -1,0 +1,1 @@
+Spring JPA with Spring REST with Spring Security with Angular JS Web application
