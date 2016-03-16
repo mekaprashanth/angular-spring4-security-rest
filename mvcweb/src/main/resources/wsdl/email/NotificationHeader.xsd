@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://com/firstdata/services/common/notification" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:complexType name="NotificationHeader">
+		<xsd:sequence>
+			<xsd:element minOccurs="1" name="NotifyTime" type="xsd:string">
+
+			</xsd:element>
+			<xsd:element minOccurs="0" name="SequenceNum" type="xsd:string">
+			</xsd:element>
+			<xsd:element minOccurs="1" name="EventTime" type="xsd:string">
+
+			</xsd:element>
+			<xsd:element minOccurs="0" name="ProcessID" type="xsd:string">
+			</xsd:element>
+			<xsd:element minOccurs="1" name="EventCode" type="xsd:string">
+
+			</xsd:element>
+			<xsd:element minOccurs="0" name="PlatformCode" type="xsd:string">
+			</xsd:element>
+			<xsd:element minOccurs="0" name="CategoryCode" type="xsd:string">
+			</xsd:element>
+			<xsd:element minOccurs="0" name="CategoryKey" type="xsd:string">
+			</xsd:element>
+			<xsd:element minOccurs="0" name="KeyLookup" type="xsd:string">
+			</xsd:element>
+			<xsd:element minOccurs="1" name="ActionNeeded" type="xsd:string">
+
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

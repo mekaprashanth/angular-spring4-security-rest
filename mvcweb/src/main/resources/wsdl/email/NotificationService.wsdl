@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="NotificationService" targetNamespace="http://com/firstdata/services/common/notification" 
+xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+xmlns:tns="http://com/firstdata/services/common/notification" 
+xmlns:bons0="http://com/fd/common/services/notificationservice">
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://com/firstdata/services/common/notification" xmlns:bons0="http://com/firstdata/services/common/notification">
+            <xsd:include schemaLocation="NotificationResponse.xsd"/>
+            <xsd:include schemaLocation="Notification.xsd"/>
+            <xsd:include schemaLocation="NotificationFault.xsd"/>
+            <xsd:element name="publish">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="notification" nillable="true" type="bons0:Notification"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+            <xsd:element name="publishResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="notificationRespose" nillable="true" type="bons0:NotificationResponse"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+            <xsd:element name="publishFault1_notificationFault" nillable="true" type="bons0:NotificationFault"/>
+        </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="publishResponseMsg">
+    <wsdl:part name="publishResult" element="tns:publishResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="publishRequestMsg">
+    <wsdl:part name="publishParameters" element="tns:publish">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="publish_notificationFaultMsg">
+    <wsdl:part name="notificationFault" element="tns:publishFault1_notificationFault">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="NotificationService">
+    <wsdl:operation name="publish">
+      <wsdl:input name="publishRequest" message="tns:publishRequestMsg">
+    </wsdl:input>
+      <wsdl:output name="publishResponse" message="tns:publishResponseMsg">
+    </wsdl:output>
+      <wsdl:fault name="notificationFault" message="tns:publish_notificationFaultMsg">
+    </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

@@ -179,7 +179,65 @@
 			<artifactId>hibernate-validator</artifactId>
 		</dependency>
 
+		<!-- Camel -->
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-core</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-spring</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+		<!-- <dependency> <groupId>org.apache.camel</groupId> <artifactId>camel-jaxb</artifactId> 
+			<version>${camel.version}</version> </dependency> -->
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-spring-javaconfig</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-http</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-cxf</artifactId>
+			<version>${camel.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.camel</groupId>
+			<artifactId>camel-restlet</artifactId>
+			<version>${camel.version}</version>
+			<!-- use the same version as your Camel core version -->
+		</dependency>
+		<dependency>
+			<groupId>org.apache.neethi</groupId>
+			<artifactId>neethi</artifactId>
+			<version>3.0.3</version>
+		</dependency>
+
+		<!-- <dependency> <groupId>org.apache.cxf</groupId> <artifactId>cxf-core</artifactId> 
+			<version>${cxf.version}</version> </dependency> -->
+
+		<!-- <dependency> <groupId>org.apache.cxf</groupId> <artifactId>cxf-rt-transports-http</artifactId> 
+			<version>${cxf.version}</version> </dependency> -->
+		<!-- <dependency> <groupId>org.apache.cxf</groupId> <artifactId>cxf-rt-frontend-jaxrs</artifactId> 
+			<version>${cxf.version}</version> </dependency> -->
+		<!-- <dependency> <groupId>org.apache.cxf</groupId> <artifactId>cxf-rt-rs-client</artifactId> 
+			<version>${cxf.version}</version> </dependency> -->
+
+		<!-- <dependency> <groupId>org.apache.cxf</groupId> <artifactId>cxf-rt-frontend-jaxws</artifactId> 
+			<version>${cxf.version}</version> </dependency> -->
+
 	</dependencies>
+	<properties>
+		<cxf.version>3.1.5</cxf.version>
+		<camel.version>2.16.2</camel.version>
+	</properties>
 	<build>
 		<finalName>mvcsample</finalName>
 		<plugins>

@@ -9,6 +9,9 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESKeySpec;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 public class EncryptionUtil {
 
@@ -69,5 +72,10 @@ public class EncryptionUtil {
     public void encryptionEnabled(final boolean isEncryptionEnabled) {
         this.encryptionEnabled = isEncryptionEnabled;
     }
+    
+    public static void main(String[] args) {
+		PasswordEncoder pE = new BCryptPasswordEncoder();
+		System.out.println(pE.encode("prash"));
+	}
 
 }

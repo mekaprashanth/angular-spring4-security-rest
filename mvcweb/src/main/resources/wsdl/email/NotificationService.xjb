@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bindings xmlns="http://java.sun.com/xml/ns/jaxb" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd"
+	jaxb:version="2.1">
+	<globalBindings>
+		<jaxb:javaType name="java.util.Date" xmlType="xs:dateTime"
+			parseMethod="de.firstdata.util.jaxb.DateAdapter.unmarshall"
+			printMethod="de.firstdata.util.jaxb.DateAdapter.marshall" />
+		<jaxb:javaType name="java.util.Date" xmlType="xs:date"
+			parseMethod="de.firstdata.util.jaxb.DateAdapter.unmarshallDate"
+			printMethod="de.firstdata.util.jaxb.DateAdapter.marshallDate" />			
+		<jaxb:serializable uid="1" />
+		<xjc:simple />
+	</globalBindings>
+	
+	<jaxb:bindings schemaLocation="AdditionalMessageData.xsd">
+        <jaxb:bindings node="//xs:complexType[@name='AdditionalMessageData']//xs:element[@name='MsgField']">
+            <jaxb:property name="msgFields"/>
+        </jaxb:bindings>
+    </jaxb:bindings>
+
+</bindings>

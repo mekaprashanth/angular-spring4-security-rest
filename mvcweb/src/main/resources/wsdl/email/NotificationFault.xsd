@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://com/firstdata/services/common/notification" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:complexType name="NotificationFault">
+		<xsd:sequence>
+			<xsd:element minOccurs="0" name="code" type="xsd:string">
+			</xsd:element>
+			<xsd:element minOccurs="0" name="faultmessage" type="xsd:string">
+			</xsd:element>
+			<xsd:element minOccurs="0" name="details" type="xsd:string">
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

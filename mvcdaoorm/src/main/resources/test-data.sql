@@ -1,6 +1,6 @@
 INSERT INTO Employees (userid, username, password, enabled)
 VALUES
-    (1, 'prash', 'prash', 1);
+    (1, 'prash', '$2a$10$dc0n7uCoSz/jS8EZiuZX6ekf9XT4g/FMSMaUQIqLnQdW98N/bXxlq', 1);
  
 INSERT INTO Roles (roleid, userid, role)
 VALUES
@@ -17,7 +17,7 @@ VALUES
 
 INSERT INTO PORTAL_USER (USER_ID, USERNAME, PASSWORD, FORENAME, LASTNAME, EMAIL_ADDRESS, IS_ACTIVE, CREATION_DATE, ACTIVATION_DATE, ACCOUNT_STATUS)
 VALUES
-    (1, 'prash', 'prash', 'prashanth', 'meka', 'prashanth_meka@infosys.com', 1, current_timestamp, current_timestamp, 'ACTIVE');
+    (1, 'prash', '$2a$10$dc0n7uCoSz/jS8EZiuZX6ekf9XT4g/FMSMaUQIqLnQdW98N/bXxlq', 'prashanth', 'meka', 'prashanth_meka@infosys.com', 1, current_timestamp, current_timestamp, 'ACTIVE');
 	
 
 INSERT INTO PORTAL_USER_FUNCTION (USER_FUNCTION_ID, ROLE_FUNCTION_ID, USER_ID)

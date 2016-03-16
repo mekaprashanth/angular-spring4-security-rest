@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema targetNamespace="http://com/firstdata/services/common/notification" xmlns:bons0="http://com/firstdata/services/common/notification" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+    <xsd:include schemaLocation="MsgField.xsd"/>
+    <xsd:complexType name="AdditionalMessageData">
+		<xsd:sequence>
+
+			<xsd:element maxOccurs="unbounded" minOccurs="0" name="MsgField" type="bons0:MsgField">
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>

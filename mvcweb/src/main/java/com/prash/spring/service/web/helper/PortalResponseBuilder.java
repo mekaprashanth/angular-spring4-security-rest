@@ -33,6 +33,15 @@ public class PortalResponseBuilder {
 		pr.setErrors(v);
 		return pr;
 	}
+	
+	public static <A> PortalResponse<Void, A> buildErrorResponse(A a) {
+		List<A> aList = new ArrayList<>();
+		aList.add(a);
+		PortalResponse<Void, A> pr = new PortalResponse<>();
+		pr.setStatus("error");
+		pr.setErrors(aList);
+		return pr;
+	}
 
 	public static ErrorDetail buildErrorResponse(String errorCode, String errorMessage) {
 		ErrorDetail ed = new ErrorDetail();

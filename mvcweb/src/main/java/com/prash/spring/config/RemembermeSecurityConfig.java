@@ -35,6 +35,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserCache;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
@@ -261,7 +263,13 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 		CustomDAOAuthenticationProviderWrapper daoAuthenticationProvider = new CustomDAOAuthenticationProviderWrapper();
 		daoAuthenticationProvider.setUserDetailsService(userDetailsServiceWithoutCache);
 		daoAuthenticationProvider.setPortalUserService(portalUserService);
+		daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
 		return daoAuthenticationProvider;
+	}
+	
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+	    return new BCryptPasswordEncoder();
 	}
 
 	@Bean
