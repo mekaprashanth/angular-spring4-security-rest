@@ -77,7 +77,7 @@ public class CustomDAOAuthenticationProviderWrapper extends DaoAuthenticationPro
 								cause = new AccountTemporarilyBlockedException("Alert User of last attempt");
 							}else if((portalUserDetails.getLoginCount()+1) == 6)	{
 								portalUserService.updateLoginAttemptsAndBlockStatusPermanent(username);
-								cause = new AccountTemporarilyBlockedException("User account is temporariliy Blocked");								
+								cause = new AccountPermanentlyBlockedException("User account is Permanently Blocked");								
 							}else	{
 								portalUserService.updateIncrementLoginAttempts(username);
 								cause = new AccountTemporarilyBlockedException("User account is temporariliy Blocked");								

@@ -150,6 +150,7 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 	        Class<?> clazz = exception.getCause().getClass();
 			List<ErrorDetail> errodDetails = new ArrayList<>();
+			
 	        if(clazz == AccountInactiveException.class)	{
 	        	errodDetails.add(PortalResponseBuilder.buildErrorResponse("MPERR01", "Account is Inactive"));
 	        }else if(clazz == AccountExpiredException.class)	{
@@ -169,6 +170,7 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 	        }
 			PortalResponse<Void, ErrorDetail> pr = PortalResponseBuilder.buildErrorResponse(errodDetails);
 	        PrintWriter writer = response.getWriter();
+			response.setContentType("application/json");
 	        writer.write(objectMapper.writeValueAsString(pr));
 	        writer.flush();
 	    }
