@@ -18,7 +18,18 @@
         <level value="debug"/>
         <appender-ref ref="console" /> 
     </logger>
+    
+    <logger name="org.springframework.jdbc" additivity="false">
+        <level value="debug"/>
+        <appender-ref ref="console" /> 
+    </logger>
+    
     <logger name="org.springframework.web" additivity="false">
+        <level value="debug"/>
+        <appender-ref ref="console" /> 
+    </logger>
+    
+    <logger name="org.quartz" additivity="false">
         <level value="debug"/>
         <appender-ref ref="console" /> 
     </logger>

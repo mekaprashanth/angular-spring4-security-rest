@@ -73,9 +73,11 @@ public class EncryptionUtil {
         this.encryptionEnabled = isEncryptionEnabled;
     }
     
-    public static void main(String[] args) {
-		PasswordEncoder pE = new BCryptPasswordEncoder();
-		System.out.println(pE.encode("prash"));
+    public static void main(String[] args) throws IOException, GeneralSecurityException {
+		EncryptionUtil util = new EncryptionUtil();
+		String encVal = util.encrypt("Gurjot@123", "test1234");
+		System.out.println(encVal);
+		System.out.println(util.decrypt(encVal, "test1234"));
 	}
 
 }

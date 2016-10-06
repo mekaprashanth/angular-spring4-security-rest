@@ -44,7 +44,9 @@ public class ControllerValidationHandler {
 		for (FieldError fieldError : errors) {
 			Locale currentLocale = LocaleContextHolder.getLocale();
 			String msg = msgSource.getMessage(fieldError, currentLocale);
-			ErrorDetail errorDetail = PortalResponseBuilder.buildErrorResponse("MPERRV100", msg);
+//			String msg1 = msgSource.getMessage(fieldError.getDefaultMessage(), fieldError.getArguments(), currentLocale);
+
+			ErrorDetail errorDetail = PortalResponseBuilder.buildErrorResponse(msg,"Field cannot be empty");
 			PortalResponseBuilder.addErrorResponse(portalResponse, errorDetail);
 		}
 		return portalResponse;

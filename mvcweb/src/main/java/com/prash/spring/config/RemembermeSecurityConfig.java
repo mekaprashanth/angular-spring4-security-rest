@@ -45,6 +45,7 @@ import org.springframework.security.web.authentication.rememberme.JdbcTokenRepos
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -108,6 +109,7 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 		.antMatchers("/fonts/**")
 		.antMatchers("/resources/**")
 		.antMatchers("/partials/**")
+		.antMatchers("/rest/**")
 		.antMatchers("/")
 		.antMatchers("/index.html");
 	}
@@ -128,9 +130,9 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 				.and().authorizeRequests()
 				
 
-				.antMatchers(HttpMethod.GET, "/rest/**").access("hasRole('USER')")
-				.antMatchers(HttpMethod.GET, "/rest/**").access("hasRole('ADMIN')")
-				.antMatchers(HttpMethod.POST, "/**").access("hasRole('ADMIN')")
+				.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('USER')")
+				.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('ADMIN')")
+				.antMatchers(HttpMethod.POST, "/rest/protected/**").access("hasRole('ADMIN')")
 				.antMatchers(HttpMethod.DELETE, "/**").access("hasRole('ADMIN')")
 				.anyRequest().authenticated()
 				.and().addFilterAfter(authenticationFilter(), RememberMeAuthenticationFilter.class)
@@ -142,6 +144,94 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 				.authenticationEntryPoint(new CustomAuthenticationEntryPoint());
 	}
 
+	/**
+	 * Remember me config
+	 */
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth
+		.authenticationProvider(rememberMeAuthenticationProvider())
+		.authenticationProvider(daoAuthenticationProviderBean())
+//				.userDetailsService(userDetailsServiceWithoutCache)
+				;
+	}
+	
+	public Filter customAuthenticationFilter()	{
+		CustomUsernamePasswordAuthenticationFilter customFilter = new CustomUsernamePasswordAuthenticationFilter();
+		customFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/login","POST"));
+//		customFilter.setAuthenticationDetailsSource(authenticationDetailsSource);
+		return null;
+	}
+
+	@Bean
+	public AuthenticationProvider daoAuthenticationProviderBean() {
+		CustomDAOAuthenticationProviderWrapper daoAuthenticationProvider = new CustomDAOAuthenticationProviderWrapper();
+		daoAuthenticationProvider.setUserDetailsService(userDetailsServiceWithoutCache);
+		daoAuthenticationProvider.setPortalUserService(portalUserService);
+		daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+		return daoAuthenticationProvider;
+	}
+	
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+	    return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public RequestHeaderCheckingPersistentTokenBasedRememberMeServices customTokenBasedRememberMeService() {
+		RequestHeaderCheckingPersistentTokenBasedRememberMeServices service = null;
+		try {
+			service = new RequestHeaderCheckingPersistentTokenBasedRememberMeServices(tokenKey,
+					userDetailsServiceWithoutCache, persistentTokenRepository());
+			service.setTokenValiditySeconds(1209600);
+			service.setAlwaysRemember(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return service;
+	}
+
+	
+	@Bean
+	public PersistentTokenBasedRememberMeServices tokenBasedRememberMeService() {
+		PersistentTokenBasedRememberMeServices service = null;
+		try {
+			service = new PersistentTokenBasedRememberMeServices(tokenKey,
+					userDetailsServiceWithoutCache, persistentTokenRepository());
+			service.setParameter("rememberme");
+			service.setTokenValiditySeconds(1209600);
+			service.setCookieName("remember_me_cookie");
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return service;
+	}
+
+	@Bean
+	public PersistentTokenRepository persistentTokenRepository() {
+		JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl();
+		db.setDataSource(datasource);
+		return db;
+	}
+
+	private Filter authenticationFilter() {
+		HeaderAuthenticationFilter headerAuthenticationFilter = new HeaderAuthenticationFilter();
+		((CustomUserDetailService)userDetailsServiceWithCache).setUserCache(userCache);
+		headerAuthenticationFilter.userDetailsService(userDetailsServiceWithCache);
+		headerAuthenticationFilter.headerUtil(headerUtil);
+		return headerAuthenticationFilter;
+	}
+
+	private CustomLogoutHandler customLogoutHandler() {
+		CustomLogoutHandler logoutHandler = new CustomLogoutHandler();
+		return logoutHandler;
+	}
+
+	@Bean
+	RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
+		return new RememberMeAuthenticationProvider(tokenKey);
+	}
 	private class AuthFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 	    @Override
 	    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
@@ -248,85 +338,5 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 		}
 	}
 
-	/**
-	 * Remember me config
-	 */
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth
-		.authenticationProvider(rememberMeAuthenticationProvider())
-		.authenticationProvider(daoAuthenticationProviderBean())
-//				.userDetailsService(userDetailsServiceWithoutCache)
-				;
-	}
-
-	@Bean
-	public AuthenticationProvider daoAuthenticationProviderBean() {
-		CustomDAOAuthenticationProviderWrapper daoAuthenticationProvider = new CustomDAOAuthenticationProviderWrapper();
-		daoAuthenticationProvider.setUserDetailsService(userDetailsServiceWithoutCache);
-		daoAuthenticationProvider.setPortalUserService(portalUserService);
-		daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-		return daoAuthenticationProvider;
-	}
 	
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-	    return new BCryptPasswordEncoder();
-	}
-
-	@Bean
-	public RequestHeaderCheckingPersistentTokenBasedRememberMeServices customTokenBasedRememberMeService() {
-		RequestHeaderCheckingPersistentTokenBasedRememberMeServices service = null;
-		try {
-			service = new RequestHeaderCheckingPersistentTokenBasedRememberMeServices(tokenKey,
-					userDetailsServiceWithoutCache, persistentTokenRepository());
-			service.setTokenValiditySeconds(1209600);
-			service.setAlwaysRemember(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return service;
-	}
-
-	
-	@Bean
-	public PersistentTokenBasedRememberMeServices tokenBasedRememberMeService() {
-		PersistentTokenBasedRememberMeServices service = null;
-		try {
-			service = new PersistentTokenBasedRememberMeServices(tokenKey,
-					userDetailsServiceWithoutCache, persistentTokenRepository());
-			service.setParameter("rememberme");
-			service.setTokenValiditySeconds(1209600);
-			service.setCookieName("remember_me_cookie");
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return service;
-	}
-
-	@Bean
-	public PersistentTokenRepository persistentTokenRepository() {
-		JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl();
-		db.setDataSource(datasource);
-		return db;
-	}
-
-	private Filter authenticationFilter() {
-		HeaderAuthenticationFilter headerAuthenticationFilter = new HeaderAuthenticationFilter();
-		((CustomUserDetailService)userDetailsServiceWithCache).setUserCache(userCache);
-		headerAuthenticationFilter.userDetailsService(userDetailsServiceWithCache);
-		headerAuthenticationFilter.headerUtil(headerUtil);
-		return headerAuthenticationFilter;
-	}
-
-	private CustomLogoutHandler customLogoutHandler() {
-		CustomLogoutHandler logoutHandler = new CustomLogoutHandler();
-		return logoutHandler;
-	}
-
-	@Bean
-	RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
-		return new RememberMeAuthenticationProvider(tokenKey);
-	}
 }

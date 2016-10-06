@@ -20,10 +20,10 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Processor;
 import org.apache.camel.ProducerTemplate;
-import org.restlet.data.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -82,6 +82,12 @@ public class UserController {
 
 	@Autowired
 	CamelContext camelContext;
+	
+//	@Autowired
+//	Job job;
+	
+//	@Autowired
+//	JobLauncher jobLauncher;
 
 	public UserController() {
 		System.out.println("UserController initialized " + ++count);
@@ -254,4 +260,13 @@ public class UserController {
 		return user;
 	}
 
+//	@RequestMapping("/triggerBatchJob")
+//	public void triggerBatchJob()	{
+//		try {
+//			jobLauncher.run(job, new JobParameters());
+//		} catch (Exception e) {
+//			logger.error("Error in Job ", e);
+//		}
+//		
+//	}
 }

@@ -25,9 +25,9 @@ public class PortalUserDetails implements UserDetails {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@NotEmpty(message="{field.empty}")
+	@NotEmpty(message="NotEmpty")
 	private String password;
-	@NotEmpty(message="{field.empty}")
+	@NotEmpty(message="field.empty")
 	private String username;
 	private Set<GrantedAuthority> authorities;
 	private boolean accountNonExpired;
@@ -35,9 +35,9 @@ public class PortalUserDetails implements UserDetails {
 	private boolean credentialsNonExpired;
 	private boolean enabled;
 	private Integer passcode;
-	@NotEmpty(message="{field.empty}")
+	@NotEmpty(message="field.empty")
 	private String firstName;
-	@NotEmpty(message="{field.empty}")
+	@NotEmpty(message="field.empty")
 	private String lastName;
 	private Long merchantId;
 	@NotEmpty(message="{field.empty}")
