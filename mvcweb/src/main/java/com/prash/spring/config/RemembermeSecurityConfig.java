@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +30,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserCache;
@@ -45,7 +45,6 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationSu
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -119,8 +118,13 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().disable()
 //		.formLogin().loginProcessingUrl("/login").usernameParameter("username")
 //		.passwordParameter("password").successHandler(successHandler).failureHandler(new AuthFailureHandler())
+<<<<<<< Upstream, based on origin/master
 		//.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 //		.and()
+=======
+		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+		.and()
+>>>>>>> 1416c3a oAuth2 changes
 		.authorizeRequests()
 //		.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('USER')")
 //		.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('ADMIN')")

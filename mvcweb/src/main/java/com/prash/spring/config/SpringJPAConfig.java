@@ -71,7 +71,7 @@ public class SpringJPAConfig {
 
 		// If the value of this property is true, Hibernate will format the SQL
 		// that is written to the console.
-		jpaProperties.put("hibernate.format_sql", env.getRequiredProperty("hibernate.format_sql"));
+		jpaProperties.put("org.hibernate.SQL", true);
 
 		entityManagerFactoryBean.setJpaProperties(jpaProperties);
 
