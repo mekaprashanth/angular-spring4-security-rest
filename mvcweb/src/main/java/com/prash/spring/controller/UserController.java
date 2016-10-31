@@ -25,7 +25,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +49,9 @@ import com.firstdatacorp.services.firstvision.voicesagetext.Keyvaluepair;
 import com.firstdatacorp.services.firstvision.voicesagetext.Parameters;
 import com.firstdatacorp.services.firstvision.voicesagetext.Schedules;
 import com.firstdatacorp.services.firstvision.voicesagetext.TextSchedulerReq;
+import com.prash.spring.config.OAuth2ResourceServer.PortalUserAwareRequest;
 import com.prash.spring.entities.Employee;
+import com.prash.spring.entities.PortalUser;
 import com.prash.spring.entities.Role;
 import com.prash.spring.model.ErrorDetail;
 import com.prash.spring.model.PortalResponse;
@@ -106,11 +112,11 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "users", produces = "application/json")
-	public List<Employee> list() throws JsonProcessingException {
+	public List<PortalUser> list() throws JsonProcessingException {
 		ObjectWriter writer = objectMaper.writerWithDefaultPrettyPrinter();
-		List<Employee> employees = userService.list();
-		System.out.println("json \n" + writer.writeValueAsString(employees));
-		return employees;
+		List<PortalUser> users = portalUserService.list();
+		System.out.println("json \n" + writer.writeValueAsString(users));
+		return users;
 	}
 
 	@RequestMapping(value = "user", produces = "application/json", method = RequestMethod.POST)
@@ -252,21 +258,43 @@ public class UserController {
 		return userValue;
 	}
 
-	@RequestMapping(value = "/user/{username}}", produces = "application/json", consumes = "application/json", method = RequestMethod.PUT)
+	@RequestMapping(value = "/user/{username}", produces = "application/json", consumes = "application/json", method = RequestMethod.PUT)
 	public UserValue update(UserValue user, HttpServletResponse response) {
 		Employee employee = userService.getUser(user.getUserName());
 		employee.setPassword(user.getPassword());
 		userService.save(employee);
 		return user;
 	}
+	
+	
+	
+	@RequestMapping(value = "protected/user/{test}", produces = "application/json", method=RequestMethod.POST)
+	public String protectecResource(@PathVariable("test") String test, Authentication authentication) {
+		
+		PortalUserAwareRequest request = getOAuth2RequestFromAuthentication();
+		String username = request.getUsername();
+		String allianceId = request.getAllianceId();
+		
+		logger.debug("username ----> "+username);
+		logger.debug("allianceId ----> "+allianceId);
+		return "Protected Resource Response with: username ----> "+username+ " and allianceId ----> "+allianceId;
+	}
+	
+	public static PortalUserAwareRequest getOAuth2RequestFromAuthentication() {
+	    Authentication authentication = getAuthentication();
+	    return getPortalUserAwareRequest(authentication);
+	}
 
-//	@RequestMapping("/triggerBatchJob")
-//	public void triggerBatchJob()	{
-//		try {
-//			jobLauncher.run(job, new JobParameters());
-//		} catch (Exception e) {
-//			logger.error("Error in Job ", e);
-//		}
-//		
-//	}
+	private static PortalUserAwareRequest getPortalUserAwareRequest(Authentication authentication) {
+	    if (!authentication.getClass().isAssignableFrom(OAuth2Authentication.class)) {
+	        throw new RuntimeException("unexpected authentication object, expected OAuth2 authentication object");
+	    }
+	    return (PortalUserAwareRequest) ((OAuth2Authentication) authentication).getOAuth2Request();
+	}
+	
+	private static Authentication getAuthentication() {
+	    SecurityContext securityContext = SecurityContextHolder.getContext();
+	    return securityContext.getAuthentication();
+	}
+
 }

@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
@@ -73,8 +74,8 @@ import com.prash.spring.service.web.helper.PortalResponseBuilder;
 @EnableWebSecurity
 public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static final String ACCESS_DENIED_JSON = "{\"message\":\"You are not privileged to request this resource.\", \"access-denied\":true,\"cause\":\"AUTHORIZATION_FAILURE\"}";
-    private static final String UNAUTHORIZED_JSON = "{\"message\":\"Full authentication is required to access this resource.\", \"access-denied\":true,\"cause\":\"NOT AUTHENTICATED\"}";
+	private static final String ACCESS_DENIED_JSON = "{\"message\":\"You are not privileged to request this resource.\", \"access-denied\":true,\"cause\":\"AUTHORIZATION_FAILURE\"}";
+	private static final String UNAUTHORIZED_JSON = "{\"message\":\"Full authentication is required to access this resource.\", \"access-denied\":true,\"cause\":\"NOT AUTHENTICATED\"}";
 	private String tokenKey = "CUSTOMHEADERTOKEN";
 
 	@Autowired
@@ -83,65 +84,61 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	@Qualifier("customUserDetailsService")
 	UserDetailsService userDetailsServiceWithoutCache;
-	
+
 	@Autowired
 	@Qualifier("customUserDetailsService")
 	UserDetailsService userDetailsServiceWithCache;
-	
+
 	@Autowired
 	UserCache userCache;
-	
-	
+
 	@Autowired
 	PortalUserService portalUserService;
-		
+
 	@Autowired
 	ObjectMapper objectMapper;
 
 	@Autowired
 	HeaderUtil headerUtil;
-	
+
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/resources/**")
-		.antMatchers("/js/**")
-		.antMatchers("/css/**")
-		.antMatchers("/fonts/**")
-		.antMatchers("/resources/**")
-		.antMatchers("/partials/**")
-		.antMatchers("/rest/**")
-		.antMatchers("/")
-		.antMatchers("/index.html");
+		web.ignoring().antMatchers("/resources/**").antMatchers("/js/**").antMatchers("/css/**")
+				.antMatchers("/fonts/**").antMatchers("/resources/**").antMatchers("/partials/**")
+//				.antMatchers("/rest/**")
+				.antMatchers("/").antMatchers("/index.html");
 	}
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		
+
 		CustomAuthenticationSuccessHandler successHandler = new CustomAuthenticationSuccessHandler();
 		successHandler.setHeaderUtil(headerUtil);
 		successHandler.setObjectMapper(objectMapper);
+
+		http.csrf().disable()
+//		.formLogin().loginProcessingUrl("/login").usernameParameter("username")
+//		.passwordParameter("password").successHandler(successHandler).failureHandler(new AuthFailureHandler())
+		//.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//		.and()
+		.authorizeRequests()
+//		.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('USER')")
+//		.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('ADMIN')")
+//		.antMatchers(HttpMethod.POST, "/rest/protected/**").access("hasRole('ADMIN')")
+//		.antMatchers(HttpMethod.DELETE, "/**").access("hasRole('ADMIN')")
+		.antMatchers("/**").authenticated()
+//		.antMatchers("/oauth/token").permitAll()
+		.and()
+		.httpBasic()
 		
-		http.csrf().disable().formLogin().loginProcessingUrl("/login")
-		.usernameParameter("username").passwordParameter("password")
-				.successHandler(successHandler)
-				.failureHandler(new AuthFailureHandler())
-
-//				.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				.and().authorizeRequests()
-				
-
-				.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('USER')")
-				.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('ADMIN')")
-				.antMatchers(HttpMethod.POST, "/rest/protected/**").access("hasRole('ADMIN')")
-				.antMatchers(HttpMethod.DELETE, "/**").access("hasRole('ADMIN')")
-				.anyRequest().authenticated()
-				.and().addFilterAfter(authenticationFilter(), RememberMeAuthenticationFilter.class)
-				.rememberMe().rememberMeServices(tokenBasedRememberMeService())
-				.tokenRepository(persistentTokenRepository())
-				.and().logout().logoutUrl("/logout").deleteCookies("remember_me_cookie", "JSESSIONID")
-				.addLogoutHandler(customLogoutHandler())
-				.and().exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler())
-				.authenticationEntryPoint(new CustomAuthenticationEntryPoint());
+//		.and()
+		;
+//		.addFilterAfter(authenticationFilter(), RememberMeAuthenticationFilter.class).rememberMe()
+//		.rememberMeServices(tokenBasedRememberMeService()).tokenRepository(persistentTokenRepository()).and()
+//		.logout().logoutUrl("/logout").deleteCookies("remember_me_cookie", "JSESSIONID")
+//		.addLogoutHandler(customLogoutHandler()).and().exceptionHandling()
+//		.accessDeniedHandler(new CustomAccessDeniedHandler())
+//		.authenticationEntryPoint(new CustomAuthenticationEntryPoint());
 	}
 
 	/**
@@ -149,17 +146,22 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 	 */
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth
-		.authenticationProvider(rememberMeAuthenticationProvider())
-		.authenticationProvider(daoAuthenticationProviderBean())
-//				.userDetailsService(userDetailsServiceWithoutCache)
+		auth.authenticationProvider(rememberMeAuthenticationProvider())
+				.authenticationProvider(daoAuthenticationProviderBean())
+				// .userDetailsService(userDetailsServiceWithoutCache)
 				;
 	}
-	
-	public Filter customAuthenticationFilter()	{
+
+	@Override
+	@Bean
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+
+	public Filter customAuthenticationFilter() {
 		CustomUsernamePasswordAuthenticationFilter customFilter = new CustomUsernamePasswordAuthenticationFilter();
-		customFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/login","POST"));
-//		customFilter.setAuthenticationDetailsSource(authenticationDetailsSource);
+		customFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/login", "POST"));
+		// customFilter.setAuthenticationDetailsSource(authenticationDetailsSource);
 		return null;
 	}
 
@@ -171,10 +173,10 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 		daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
 		return daoAuthenticationProvider;
 	}
-	
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
-	    return new BCryptPasswordEncoder();
+		return new BCryptPasswordEncoder();
 	}
 
 	@Bean
@@ -191,17 +193,16 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 		return service;
 	}
 
-	
 	@Bean
 	public PersistentTokenBasedRememberMeServices tokenBasedRememberMeService() {
 		PersistentTokenBasedRememberMeServices service = null;
 		try {
-			service = new PersistentTokenBasedRememberMeServices(tokenKey,
-					userDetailsServiceWithoutCache, persistentTokenRepository());
+			service = new PersistentTokenBasedRememberMeServices(tokenKey, userDetailsServiceWithoutCache,
+					persistentTokenRepository());
 			service.setParameter("rememberme");
 			service.setTokenValiditySeconds(1209600);
 			service.setCookieName("remember_me_cookie");
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -217,7 +218,7 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 
 	private Filter authenticationFilter() {
 		HeaderAuthenticationFilter headerAuthenticationFilter = new HeaderAuthenticationFilter();
-		((CustomUserDetailService)userDetailsServiceWithCache).setUserCache(userCache);
+		((CustomUserDetailService) userDetailsServiceWithCache).setUserCache(userCache);
 		headerAuthenticationFilter.userDetailsService(userDetailsServiceWithCache);
 		headerAuthenticationFilter.headerUtil(headerUtil);
 		return headerAuthenticationFilter;
@@ -232,56 +233,60 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 	RememberMeAuthenticationProvider rememberMeAuthenticationProvider() {
 		return new RememberMeAuthenticationProvider(tokenKey);
 	}
+
 	private class AuthFailureHandler extends SimpleUrlAuthenticationFailureHandler {
-	    @Override
-	    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-	            AuthenticationException exception) throws IOException, ServletException {
-			System.out.println("AuthFailureHandler Login failed due to "+exception.getClass());			
-	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-	        Class<?> clazz = exception.getCause().getClass();
+		@Override
+		public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
+				AuthenticationException exception) throws IOException, ServletException {
+			System.out.println("AuthFailureHandler Login failed due to " + exception.getClass());
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			Class<?> clazz = exception.getCause().getClass();
 			List<ErrorDetail> errodDetails = new ArrayList<>();
-			
-	        if(clazz == AccountInactiveException.class)	{
-	        	errodDetails.add(PortalResponseBuilder.buildErrorResponse("MPERR01", "Account is Inactive"));
-	        }else if(clazz == AccountExpiredException.class)	{
-	        	errodDetails.add(PortalResponseBuilder.buildErrorResponse("MPERR02", "Account has Expired"));
-	        }else if(clazz == AccountTemporarilyBlockedException.class)	{
-	        	ErrorDetail errorDetail = PortalResponseBuilder.buildErrorResponse("MPERR03", "Account blocked Temporarily");
-	        	if(exception.getMessage().indexOf("Alert") > -1)	{
-	        		errorDetail = PortalResponseBuilder.buildErrorResponse("MPERR03", "Account blocked Temporarily - Warn Last Attempt");
-	        	}
-	        	errodDetails.add(errorDetail);
-	        }else if(clazz == AccountPermanentlyBlockedException.class)	{
-	        	errodDetails.add(PortalResponseBuilder.buildErrorResponse("MPERR04", "Account blocked Permanently"));
-	        }else if(clazz == BadCredentialsException.class)	{
-	        	errodDetails.add(PortalResponseBuilder.buildErrorResponse("MPERR05", "Insufficient credentials"));
-	        }else	{
-	        	errodDetails.add(PortalResponseBuilder.buildErrorResponse("MPERR06", "Insufficient credentials"));
-	        }
+
+			if (clazz == AccountInactiveException.class) {
+				errodDetails.add(PortalResponseBuilder.buildErrorResponse("MPERR01", "Account is Inactive"));
+			} else if (clazz == AccountExpiredException.class) {
+				errodDetails.add(PortalResponseBuilder.buildErrorResponse("MPERR02", "Account has Expired"));
+			} else if (clazz == AccountTemporarilyBlockedException.class) {
+				ErrorDetail errorDetail = PortalResponseBuilder.buildErrorResponse("MPERR03",
+						"Account blocked Temporarily");
+				if (exception.getMessage().indexOf("Alert") > -1) {
+					errorDetail = PortalResponseBuilder.buildErrorResponse("MPERR03",
+							"Account blocked Temporarily - Warn Last Attempt");
+				}
+				errodDetails.add(errorDetail);
+			} else if (clazz == AccountPermanentlyBlockedException.class) {
+				errodDetails.add(PortalResponseBuilder.buildErrorResponse("MPERR04", "Account blocked Permanently"));
+			} else if (clazz == BadCredentialsException.class) {
+				errodDetails.add(PortalResponseBuilder.buildErrorResponse("MPERR05", "Insufficient credentials"));
+			} else {
+				errodDetails.add(PortalResponseBuilder.buildErrorResponse("MPERR06", "Insufficient credentials"));
+			}
 			PortalResponse<Void, ErrorDetail> pr = PortalResponseBuilder.buildErrorResponse(errodDetails);
-	        PrintWriter writer = response.getWriter();
+			PrintWriter writer = response.getWriter();
 			response.setContentType("application/json");
-	        writer.write(objectMapper.writeValueAsString(pr));
-	        writer.flush();
-	    }
+			writer.write(objectMapper.writeValueAsString(pr));
+			writer.flush();
+		}
 	}
 
 	private static class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
 		private HeaderUtil headerUtil;
 		private ObjectMapper objectMapper;
-		
+
 		@Override
 		public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
 				Authentication authentication) throws ServletException, IOException {
 			try {
 				String token = request.getHeader(HeaderUtil.HEADER_NAME);
-				if(token == null || token == "")	{
+				if (token == null || token == "") {
 					token = headerUtil.createAuthToken(((UserDetails) authentication.getPrincipal()).getUsername());
 				}
-				PortalUserDetails user =(PortalUserDetails) authentication.getPrincipal();
-				UserValue userValue = new UserValue(user.getFirstName(), user.getLastName(), user.getUsername(), user.getPassword());
-				userValue.setRoles(Arrays.asList("ADMIN","USER"));
+				PortalUserDetails user = (PortalUserDetails) authentication.getPrincipal();
+				UserValue userValue = new UserValue(user.getFirstName(), user.getLastName(), user.getUsername(),
+						user.getPassword());
+				userValue.setRoles(Arrays.asList("ADMIN", "USER"));
 				PortalResponse<UserValue, Void> pr = PortalResponseBuilder.buildSuccessResponse(userValue);
 
 				ObjectWriter writer = objectMapper.writerWithDefaultPrettyPrinter();
@@ -301,6 +306,7 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 		public void setHeaderUtil(HeaderUtil headerUtil) {
 			this.headerUtil = headerUtil;
 		}
+
 		public void setObjectMapper(ObjectMapper objectMapper) {
 			this.objectMapper = objectMapper;
 		}
@@ -311,8 +317,8 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 		@Override
 		public void handle(HttpServletRequest request, HttpServletResponse response,
 				AccessDeniedException accessDeniedException) throws IOException, ServletException {
-			
-			System.out.println("CustomAccessDeniedHandler Login failed due to "+accessDeniedException.getClass());
+
+			System.out.println("CustomAccessDeniedHandler Login failed due to " + accessDeniedException.getClass());
 			response.setContentType("application/json");
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			PrintWriter out = response.getWriter();
@@ -322,13 +328,12 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		}
 	}
-	
 
 	private static class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 		@Override
 		public void commence(HttpServletRequest request, HttpServletResponse response,
 				AuthenticationException authException) throws IOException, ServletException {
-			System.out.println("CustomAuthenticationEntryPoint Login failed due to "+authException.getClass());
+			System.out.println("CustomAuthenticationEntryPoint Login failed due to " + authException.getClass());
 			response.setContentType("application/json");
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			PrintWriter out = response.getWriter();
@@ -338,5 +343,4 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 		}
 	}
 
-	
 }

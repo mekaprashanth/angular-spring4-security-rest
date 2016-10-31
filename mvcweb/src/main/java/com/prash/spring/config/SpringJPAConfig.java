@@ -36,7 +36,7 @@ public class SpringJPAConfig {
     @Bean()
     public DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
-            .setType(EmbeddedDatabaseType.HSQL)
+            .setType(EmbeddedDatabaseType.H2)
             .addScript("classpath:schema.sql")
             .addScript("classpath:test-data.sql")
             .addScript("classpath:persisted_logins_create_table.sql")
@@ -88,11 +88,18 @@ public class SpringJPAConfig {
 	@PostConstruct
 	public void startDBManager() {
 		//hsqldb
-		DatabaseManagerSwing.main(new String[] { "--url", "jdbc:hsqldb:mem:testdb", "--user", "sa", "--password", "" });
-		//derby
-		//DatabaseManagerSwing.main(new String[] { "--url", "jdbc:derby:memory:testdb", "--user", "", "--password", "" });
+//		DatabaseManagerSwing.main(new String[] { "--url", "jdbc:hsqldb:mem:testdb", "--user", "sa", "--password", "" });
+//		//derby
+//		DatabaseManagerSwing.main(new String[] { "--url", "jdbc:derby:memory:testdb", "--user", "", "--password", "" });
 		//h2
-		//DatabaseManagerSwing.main(new String[] { "--url", "jdbc:h2:mem:testdb", "--user", "sa", "--password", "" });
+		try {
+			Class.forName("org.h2.Driver");
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+		DatabaseManagerSwing.main(new String[] { "--url", "jdbc:h2:mem:testdb", "--user", "sa", "--password", "" });
 
 	}
 }

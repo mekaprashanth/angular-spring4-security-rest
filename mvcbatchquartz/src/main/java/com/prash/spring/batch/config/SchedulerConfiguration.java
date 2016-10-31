@@ -12,6 +12,8 @@ import java.util.Properties;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
+import org.quartz.SimpleTrigger;
+import org.quartz.spi.JobFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,18 +35,14 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class SchedulerConfiguration {
-	
-    private final Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
+	private final Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
 	@Autowired
 	DataSource dataSource;
 
 	@Autowired
 	PlatformTransactionManager transactionManager;
-	
-	@Autowired
-	private ApplicationContext applicationContext;
 
 	@Bean
 	public JobDetailFactoryBean testJob1() throws ClassNotFoundException, NoSuchMethodException {
@@ -56,12 +54,12 @@ public class SchedulerConfiguration {
 		map.put(MyQuartzJobBean.COUNT, "1");
 		map.put("Date", (new Date()).toString());
 		jobDetailFactory.setJobDataAsMap(map);
-		jobDetailFactory.setGroup("mygroup");
+		jobDetailFactory.setGroup("mygroup1");
 		jobDetailFactory.setName("myjob1");
 		jobDetailFactory.setDurability(true);
 		return jobDetailFactory;
 	}
-	
+
 	@Bean
 	public JobDetailFactoryBean testJob2() throws ClassNotFoundException, NoSuchMethodException {
 		JobDetailFactoryBean jobDetailFactory = new JobDetailFactoryBean();
@@ -71,9 +69,10 @@ public class SchedulerConfiguration {
 		map.put("someParam", "RAM");
 		map.put("someParam2", "1");
 		jobDetailFactory.setJobDataAsMap(map);
-		jobDetailFactory.setGroup("mygroup");
+		jobDetailFactory.setGroup("mygroup2");
 		jobDetailFactory.setName("myjob2");
 		jobDetailFactory.setDurability(true);
+
 		return jobDetailFactory;
 	}
 
@@ -83,43 +82,51 @@ public class SchedulerConfiguration {
 		CronTriggerFactoryBean cronTriggerFactoryBean = new CronTriggerFactoryBean();
 		cronTriggerFactoryBean.setBeanName("prash.testJobTrigger");
 		cronTriggerFactoryBean.setJobDetail(testJob1().getObject());
-		cronTriggerFactoryBean.setCronExpression("0/15 * * * * ?");
+		cronTriggerFactoryBean.setCronExpression("0/5 * 0 * * ?");
 		cronTriggerFactoryBean.setName("mytrigger1");
-		cronTriggerFactoryBean.setGroup("mygroup");
+		cronTriggerFactoryBean.setGroup("mygroup1");
+		cronTriggerFactoryBean.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+
 		return cronTriggerFactoryBean;
 	}
-	
+
 	@Bean
 	public CronTriggerFactoryBean testJob2Trigger()
 			throws ParseException, ClassNotFoundException, NoSuchMethodException {
 		CronTriggerFactoryBean cronTriggerFactoryBean = new CronTriggerFactoryBean();
 		cronTriggerFactoryBean.setBeanName("prash.testJobTrigger");
 		cronTriggerFactoryBean.setJobDetail(testJob2().getObject());
-		cronTriggerFactoryBean.setCronExpression("0/15 * * * * ?");
+		cronTriggerFactoryBean.setCronExpression("5/5 * 0 * * ?");
 		cronTriggerFactoryBean.setName("mytrigger2");
-		cronTriggerFactoryBean.setGroup("mygroup");
+		cronTriggerFactoryBean.setGroup("mygroup2");
+		cronTriggerFactoryBean.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_FIRE_NOW);
+
 		return cronTriggerFactoryBean;
 	}
 
 	@Bean
-	public SchedulerFactoryBean setupSchedulerFactoryBean()
+	public SchedulerFactoryBean setupSchedulerFactoryBean(JobFactory jobFactory)
 			throws ClassNotFoundException, NoSuchMethodException, IOException {
 		SchedulerFactoryBean schedulerfaFactoryBean = new SchedulerFactoryBean();
 		schedulerfaFactoryBean.setDataSource(dataSource);
 		schedulerfaFactoryBean.setTransactionManager(transactionManager);
-		schedulerfaFactoryBean.setTriggers(testJob1Trigger().getObject(),testJob2Trigger().getObject());
+		schedulerfaFactoryBean.setTriggers(testJob1Trigger().getObject(), testJob2Trigger().getObject());
 		schedulerfaFactoryBean.setOverwriteExistingJobs(true);
 		schedulerfaFactoryBean.setSchedulerName("prash-scheduler");
 		schedulerfaFactoryBean.setWaitForJobsToCompleteOnShutdown(true);
 		schedulerfaFactoryBean.setQuartzProperties(quartzProperties());
-
-		AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
-		jobFactory.setApplicationContext(applicationContext);
 		schedulerfaFactoryBean.setJobFactory(jobFactory);
 
 		return schedulerfaFactoryBean;
 	}
-	
+
+	@Bean
+	public JobFactory jobFactory(ApplicationContext applicationContext) {
+		AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
+		jobFactory.setApplicationContext(applicationContext);
+		return jobFactory;
+	}
+
 	@Bean
 	public Properties quartzProperties() {
 		PropertiesFactoryBean propertiesFactoryBean = new PropertiesFactoryBean();

@@ -39,8 +39,6 @@ public class PortalFunction implements Serializable {
 	@Column(name="REST_URL")
 	private String restUrl;
 	
-	@OneToMany(mappedBy="portalFunction")
-	private List<PortalRoleFunction> portalRoleFunctions;
 	
 	public PortalFunction() {
 		
@@ -78,14 +76,7 @@ public class PortalFunction implements Serializable {
 		this.restUrl = restUrl;
 	}
 
-	public List<PortalRoleFunction> getPortalRoleFunctions() {
-		return portalRoleFunctions;
-	}
-
-	public void setPortalRoleFunctions(List<PortalRoleFunction> portalRoleFunctions) {
-		this.portalRoleFunctions = portalRoleFunctions;
-	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

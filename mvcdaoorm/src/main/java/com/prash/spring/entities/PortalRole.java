@@ -4,16 +4,12 @@
 package com.prash.spring.entities;
 
 import java.io.Serializable;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -38,8 +34,6 @@ public class PortalRole implements Serializable {
 	@Column(name="DESCRIPTION")
 	private String description;
 	
-	@OneToMany(mappedBy="portalRole")
-	private List<PortalRoleFunction> portalRoleFunctions;
 	
 	public PortalRole() {
 		
@@ -69,13 +63,6 @@ public class PortalRole implements Serializable {
 		this.description = description;
 	}
 
-	public List<PortalRoleFunction> getPortalRoleFunctions() {
-		return portalRoleFunctions;
-	}
-
-	public void setPortalRoleFunctions(List<PortalRoleFunction> portalRoleFunctions) {
-		this.portalRoleFunctions = portalRoleFunctions;
-	}
 
 	@Override
 	public int hashCode() {

@@ -12,6 +12,7 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.prash.spring.dao.PortalUserDAO;
 import com.prash.spring.entities.PortalFunction;
 import com.prash.spring.entities.PortalRole;
 import com.prash.spring.entities.PortalRoleFunction;
@@ -46,6 +47,9 @@ public class PortalUserServiceImpl implements PortalUserService {
 
 	@Autowired
 	PortalRoleFunctionRepository portalRoleFunctionRepository;
+	
+	@Autowired
+	PortalUserDAO portalUserDAO;
 
 	@Override
 	public PortalUser getUser(String username) {
@@ -72,7 +76,8 @@ public class PortalUserServiceImpl implements PortalUserService {
 
 	@Override
 	public List<PortalUser> list() {
-		return portalUserRepository.findAll();
+//		return portalUserRepository.findAll();
+		return portalUserDAO.findAllNative();
 	}
 
 	@Override
