@@ -271,7 +271,6 @@ public class UserController {
 	@RequestMapping(value = "protected/user/{test}", produces = "application/json", method=RequestMethod.POST)
 	public String protectecResource(@PathVariable("test") String test, Authentication authentication) {
 		
-<<<<<<< Upstream, based on origin/master
 		PortalUserAwareRequest request = getOAuth2RequestFromAuthentication();
 		String username = request.getUsername();
 		String allianceId = request.getAllianceId();
@@ -298,32 +297,5 @@ public class UserController {
 	    return securityContext.getAuthentication();
 	}
 
-=======
-		PortalUserAwareRequest request = getPortalUserAwareRequest(authentication);
-		String username = request.getUsername();
-		String allianceId = request.getAllianceId();
-		
-		logger.debug("username ----> "+username);
-		logger.debug("allianceId ----> "+allianceId);
-		return "Protected Resource Response with: username ----> "+username+ " and allianceId ----> "+allianceId;
-	}
-	
-	@RequestMapping(value = "protected/client/user/{test}", produces = "application/json", method=RequestMethod.POST)
-	public String protectecClientResource(@PathVariable("test") String test, Authentication authentication) {
-		
-		PortalUserAwareRequest request = getPortalUserAwareRequest(authentication);
-		String username = request.getUsername();
-		String allianceId = request.getAllianceId();
-		
-		logger.debug("username ----> "+username);
-		logger.debug("allianceId ----> "+allianceId);
-		return "Protected Resource Response with: username ----> "+username+ " and allianceId ----> "+allianceId;
-	}
-	private static PortalUserAwareRequest getPortalUserAwareRequest(Authentication authentication) {
-	    if (!authentication.getClass().isAssignableFrom(OAuth2Authentication.class)) {
-	        throw new RuntimeException("unexpected authentication object, expected OAuth2 authentication object");
-	    }
-	    return (PortalUserAwareRequest) ((OAuth2Authentication) authentication).getOAuth2Request();
-	}
->>>>>>> 1416c3a oAuth2 changes
+
 }

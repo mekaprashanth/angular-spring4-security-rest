@@ -118,13 +118,9 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.csrf().disable()
 //		.formLogin().loginProcessingUrl("/login").usernameParameter("username")
 //		.passwordParameter("password").successHandler(successHandler).failureHandler(new AuthFailureHandler())
-<<<<<<< Upstream, based on origin/master
 		//.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 //		.and()
-=======
-		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-		.and()
->>>>>>> 1416c3a oAuth2 changes
+
 		.authorizeRequests()
 //		.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('USER')")
 //		.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('ADMIN')")
