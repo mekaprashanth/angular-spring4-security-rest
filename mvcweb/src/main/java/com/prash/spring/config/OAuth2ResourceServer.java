@@ -42,13 +42,6 @@ public class OAuth2ResourceServer extends ResourceServerConfigurerAdapter {
 				.antMatchers("/oauth/authorize").authenticated()
 				
 				.and()
-//				.anyRequest().authenticated()
-//				.and()
-//				.formLogin()
-//				.loginProcessingUrl("/rest/login")
-////				.and().exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login.jsp"))
-//				.and().csrf().disable()
-//				.httpBasic().disable();
 				;
 	}	
 

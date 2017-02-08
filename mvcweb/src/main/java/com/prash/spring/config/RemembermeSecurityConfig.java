@@ -116,29 +116,11 @@ public class RemembermeSecurityConfig extends WebSecurityConfigurerAdapter {
 		successHandler.setObjectMapper(objectMapper);
 
 		http.csrf().disable()
-//		.formLogin().loginProcessingUrl("/login").usernameParameter("username")
-//		.passwordParameter("password").successHandler(successHandler).failureHandler(new AuthFailureHandler())
-		//.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//		.and()
-
-		.authorizeRequests()
-//		.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('USER')")
-//		.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('ADMIN')")
-//		.antMatchers(HttpMethod.POST, "/rest/protected/**").access("hasRole('ADMIN')")
-//		.antMatchers(HttpMethod.DELETE, "/**").access("hasRole('ADMIN')")
-		.antMatchers("/**").authenticated()
-//		.antMatchers("/oauth/token").permitAll()
+		.formLogin()
+		.loginProcessingUrl("/rest/login")
 		.and()
-		.httpBasic()
-		
-//		.and()
-		;
-//		.addFilterAfter(authenticationFilter(), RememberMeAuthenticationFilter.class).rememberMe()
-//		.rememberMeServices(tokenBasedRememberMeService()).tokenRepository(persistentTokenRepository()).and()
-//		.logout().logoutUrl("/logout").deleteCookies("remember_me_cookie", "JSESSIONID")
-//		.addLogoutHandler(customLogoutHandler()).and().exceptionHandling()
-//		.accessDeniedHandler(new CustomAccessDeniedHandler())
-//		.authenticationEntryPoint(new CustomAuthenticationEntryPoint());
+		.authorizeRequests()
+		.anyRequest().authenticated();
 	}
 
 	/**
