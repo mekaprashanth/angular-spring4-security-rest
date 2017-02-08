@@ -105,7 +105,8 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-entitymanager</artifactId>
-		</dependency>
+<!-- 			<scope>provided</scope>
+ -->		</dependency>
 
 		<!-- Spring Data JPA -->
 		<dependency>

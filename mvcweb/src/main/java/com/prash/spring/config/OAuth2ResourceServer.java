@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfiguration;
@@ -20,30 +21,36 @@ import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConv
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 @Configuration
 @EnableResourceServer
+@Order(3)
 public class OAuth2ResourceServer extends ResourceServerConfigurerAdapter {
 	final static Logger LOG = LoggerFactory.getLogger(ResourceServerConfiguration.class);
 
-
-	
-	
 	@Override
-		public void configure(HttpSecurity http) throws Exception {
-			http.csrf().disable()
-			.authorizeRequests()
-			.antMatchers("/oauth/token").permitAll()
-					.antMatchers(HttpMethod.GET, "/foo").hasAuthority("FOO_READ")
-					// .antMatchers(HttpMethod.GET,
-					// "/rest/protected/**").hasAuthority("USER")
-					.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('USER')")
-					.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('ADMIN')")
-					.antMatchers(HttpMethod.POST, "/rest/protected/**").access("hasRole('ADMIN')")
-					.antMatchers(HttpMethod.DELETE, "/**").access("hasRole('ADMIN')").antMatchers("/welcome")
-					.authenticated();
-		}
-
+	public void configure(HttpSecurity http) throws Exception {
+		http.authorizeRequests()
+//		.antMatchers("/rest/oauth/**").permitAll()
+				.antMatchers(HttpMethod.GET, "/foo").hasAuthority("FOO_READ")
+				.antMatchers("/rest/login", "/login.jsp").permitAll()
+				.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('USER')")
+				.antMatchers(HttpMethod.GET, "/rest/protected/**").access("hasRole('ADMIN')")
+				.antMatchers(HttpMethod.POST, "/rest/protected/**").access("hasRole('ADMIN')")
+				.antMatchers(HttpMethod.DELETE, "/**").access("hasRole('ADMIN')")
+				.antMatchers("/oauth/authorize").authenticated()
+				
+				.and()
+//				.anyRequest().authenticated()
+//				.and()
+//				.formLogin()
+//				.loginProcessingUrl("/rest/login")
+////				.and().exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login.jsp"))
+//				.and().csrf().disable()
+//				.httpBasic().disable();
+				;
+	}	
 
 	@Override
 	public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
@@ -55,9 +62,9 @@ public class OAuth2ResourceServer extends ResourceServerConfigurerAdapter {
 	public TokenStore tokenStore() {
 		return new JwtTokenStore(getJwtAccessTokenConverter());
 	}
-	
+
 	private JwtAccessTokenConverter jwtAccessTokenConverter;
-	
+
 	@Autowired
 	public void setJwtAccessTokenConverter(JwtAccessTokenConverter jwtAccessTokenConverter) {
 		this.jwtAccessTokenConverter = jwtAccessTokenConverter;
@@ -66,39 +73,39 @@ public class OAuth2ResourceServer extends ResourceServerConfigurerAdapter {
 
 	protected JwtAccessTokenConverter getJwtAccessTokenConverter() {
 		return jwtAccessTokenConverter;
-	}	
-	
-	public DefaultAccessTokenConverter defaultAccessTokenConverter()	{
+	}
+
+	public DefaultAccessTokenConverter defaultAccessTokenConverter() {
 		return new PortalUserAccessTokenConverter();
 	}
-	
-	protected static class PortalUserAccessTokenConverter extends DefaultAccessTokenConverter	{
-		
+
+	protected static class PortalUserAccessTokenConverter extends DefaultAccessTokenConverter {
+
 		@Override
-		public OAuth2Authentication extractAuthentication(Map<String, ?> map)	{
+		public OAuth2Authentication extractAuthentication(Map<String, ?> map) {
 			OAuth2Authentication authentication = super.extractAuthentication(map);
 			PortalUserAwareRequest request = new PortalUserAwareRequest(authentication.getOAuth2Request());
-			request.setAllianceId((String)map.get("allianceId"));
-			request.setUsername((String)map.get("username"));
+			request.setAllianceId((String) map.get("allianceId"));
+			request.setUsername((String) map.get("username"));
 			return new OAuth2Authentication(request, authentication.getUserAuthentication());
 		}
 	}
-	
-	
+
 	public static class PortalUserAwareRequest extends OAuth2Request {
 
 		private static final long serialVersionUID = 1L;
-		
-		private String username;
-	    private String allianceId;
-	    
-	    public PortalUserAwareRequest(OAuth2Request other) {
-	        super(other);
-	    }
 
-	    public String getUsername() {
+		private String username;
+		private String allianceId;
+
+		public PortalUserAwareRequest(OAuth2Request other) {
+			super(other);
+		}
+
+		public String getUsername() {
 			return username;
 		}
+
 		public void setUsername(String username) {
 			this.username = username;
 		}
@@ -109,20 +116,18 @@ public class OAuth2ResourceServer extends ResourceServerConfigurerAdapter {
 
 		public void setAllianceId(String allianceId) {
 			this.allianceId = allianceId;
-		}	    
+		}
 	}
-	
+
 	/*
-	@Autowired
-	private ClientDetailsService clientDetailsService;
-	
-	@Bean
-    public ResourceServerTokenServices defaultTokenServices() {
-        final DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
-        defaultTokenServices.setTokenEnhancer(getJwtAccessTokenConverter());
-        defaultTokenServices.setTokenStore(tokenStore());
-        defaultTokenServices.setClientDetailsService(clientDetailsService);
-        return defaultTokenServices;
-    }*/
-	
+	 * @Autowired private ClientDetailsService clientDetailsService;
+	 * 
+	 * @Bean public ResourceServerTokenServices defaultTokenServices() { final
+	 * DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
+	 * defaultTokenServices.setTokenEnhancer(getJwtAccessTokenConverter());
+	 * defaultTokenServices.setTokenStore(tokenStore());
+	 * defaultTokenServices.setClientDetailsService(clientDetailsService);
+	 * return defaultTokenServices; }
+	 */
+
 }

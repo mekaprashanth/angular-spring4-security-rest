@@ -6,7 +6,11 @@ package com.prash.spring.service.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Date;
+import java.util.Locale;
 
 import org.joda.time.DateTime;
 
@@ -43,5 +47,13 @@ public class CommonUtil {
 
 			return os.toByteArray();
 		}
+	}
+	
+	public static void main(String[] args) throws ParseException {
+		NumberFormat nf = NumberFormat.getInstance(Locale.CHINA);
+		BigDecimal val = new BigDecimal(413.99);
+		Double d = Double.valueOf(nf.format(val.doubleValue()));
+//		Double d = (Double) nf.parse(nf.format(val.doubleValue()));
+		System.out.println(d);
 	}
 }

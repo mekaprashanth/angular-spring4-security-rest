@@ -2,7 +2,6 @@ package com.prash.spring.config;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -10,57 +9,57 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerEndpointsConfiguration;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
-import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
+import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
-import org.springframework.util.StringUtils;
 
 import com.prash.spring.model.PortalUserDetails;
 
 @Configuration
 @EnableAuthorizationServer
+@Order(2)
+@Import( AuthorizationServerEndpointsConfiguration.class)
 public class OAuth2AuthorizationServer extends AuthorizationServerConfigurerAdapter {
 
 	@Autowired
 	@Qualifier("customUserDetailsService")
 	UserDetailsService userDetailsServiceWithoutCache;
+	
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
 
+	
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
-		// oauthServer.tokenKeyAccess("permitAll()")
-		// .checkTokenAccess("isAuthenticated()")
 		oauthServer
-		
 		.tokenKeyAccess("permitAll()")
 		.checkTokenAccess("isAuthenticated()")
-//		 .allowFormAuthenticationForClients()
+		 .allowFormAuthenticationForClients()
 				;
 	}
 
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		clients.inMemory().withClient("web_app").scopes("FOO").autoApprove(true)
-				.authorities("FOO_READ", "FOO_WRITE", "ADMIN")
+		clients.inMemory().withClient("web_app").scopes("write", "foo", "read")
+//		.autoApprove(true)
+//		.redirectUris("http://localhost:8081/mvcsample/index.html")
+				.authorities("FOO_READ", "FOO_WRITE")
+				
 				.authorizedGrantTypes("implicit", "refresh_token", "password", "authorization_code");
 	}
 
@@ -69,8 +68,13 @@ public class OAuth2AuthorizationServer extends AuthorizationServerConfigurerAdap
 		endpoints
 		.prefix("/rest")
 		.tokenStore(tokenStore()).tokenEnhancer(jwtTokenEnhancer())
-		.authenticationManager(this.authenticationManager).userDetailsService(userDetailsServiceWithoutCache);
+		.authenticationManager(this.authenticationManager)
+		.userDetailsService(userDetailsServiceWithoutCache)
+		.pathMapping("/oauth/confirm_access", "/rest/oauth/confirm_access")
+		
+		;
 	}
+	
 
 	@Bean
 	public TokenStore tokenStore() {
@@ -103,6 +107,8 @@ public class OAuth2AuthorizationServer extends AuthorizationServerConfigurerAdap
 
         }
 	}
+	
+	
 	
 	public static void main(String[] args) throws UnsupportedEncodingException {
 		System.out.println(Base64.getEncoder().encode("web_app:".getBytes("UTF-8")).toString());

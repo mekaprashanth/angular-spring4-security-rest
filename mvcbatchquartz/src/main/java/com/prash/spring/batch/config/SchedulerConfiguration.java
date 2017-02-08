@@ -33,7 +33,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  *
  */
 
-@Configuration
+//@Configuration
 public class SchedulerConfiguration {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
