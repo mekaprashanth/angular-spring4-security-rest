@@ -28,8 +28,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -252,7 +252,7 @@ public class UserController {
 
 	@RequestMapping(value = "/checklogin", produces = "application/json", method = RequestMethod.GET)
 	public UserValue checkLogin(Authentication authentication) {
-		User user = (User) authentication.getPrincipal();
+		UserDetails user = (UserDetails) authentication.getPrincipal();
 		UserValue userValue = new UserValue("", "", user.getUsername(), user.getPassword());
 		userValue.setRoles(Arrays.asList("ADMIN", "USER"));
 		return userValue;

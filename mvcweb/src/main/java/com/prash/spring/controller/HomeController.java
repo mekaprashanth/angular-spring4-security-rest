@@ -36,7 +36,7 @@ private static int count = 0;
 	public String test()	{
 		return "index";
 	}
-	@RequestMapping({"/oauth/confirm_access", "/rest/oauth/confirm_access"})
+	@RequestMapping({"/oauth/confirm_access"})
 	public ModelAndView getAccessConfirmation(Map<String, Object> model, HttpServletRequest request) throws Exception {
 		String template = createTemplate(model, request);
 		if (request.getAttribute("_csrf") != null) {
@@ -80,11 +80,11 @@ private static int count = 0;
 
 	private static String CSRF = "<input type='hidden' name='${_csrf.parameterName}' value='${_csrf.token}' />";
 
-	private static String DENIAL = "<form id='denialForm' name='denialForm' action='${path}/oauth/authorize' method='post'><input name='user_oauth_approval' value='false' type='hidden'/>%csrf%<label><input name='deny' value='Deny' type='submit'/></label></form>";
+	private static String DENIAL = "<form id='denialForm' name='denialForm' action='${path}/rest/oauth/authorize' method='post'><input name='user_oauth_approval' value='false' type='hidden'/>%csrf%<label><input name='deny' value='Deny' type='submit'/></label></form>";
 
 	private static String TEMPLATE = "<html><body><h1>OAuth Approval</h1>"
 			+ "<p>Do you authorize '${authorizationRequest.clientId}' to access your protected resources?</p>"
-			+ "<form id='confirmationForm' name='confirmationForm' action='${path}/oauth/authorize' method='post'><input name='user_oauth_approval' value='true' type='hidden'/>%csrf%%scopes%<label><input name='authorize' value='Authorize' type='submit'/></label></form>"
+			+ "<form id='confirmationForm' name='confirmationForm' action='${path}/rest/oauth/authorize' method='post'><input name='user_oauth_approval' value='true' type='hidden'/>%csrf%%scopes%<label><input name='authorize' value='Authorize' type='submit'/></label></form>"
 			+ "%denial%</body></html>";
 
 	private static String SCOPE = "<li><div class='form-group'>%scope%: <input type='radio' name='%key%'"
