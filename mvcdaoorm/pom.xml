@@ -7,6 +7,5 @@
 		<groupId>com.prash.spring</groupId>
 		<artifactId>mvcparent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-		<relativePath>../mvcparent</relativePath>
 	</parent>
 </project>

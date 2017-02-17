@@ -195,50 +195,6 @@ public class PortalUserServiceImpl implements PortalUserService {
 			System.out.println(puf);
 			System.out.println();
 		}
-		
-		Optional<String> testParam = Optional.of("");
-		String transactionQueryForTranslation = " select v from VwClearingWithRefundForTranslation v , Dictionary d "
-                + " where d.cat=:category  and d.languageCode=:langCode and  d.allianceCode=:allianceCode and "
-                + " v.allianceCode = :allianceCode and "
-                + " v.merchId in (select ua.merchToUserPK.merchId from  UsrMerchAccess ua where ua.merchToUserPK.userId=:userId)"
-                + (testParam.isPresent()? " and (v.clearingId in (select ca.id.clearingId from ClearingToAuth ca where ca.id.authId=:authId))" :"")
-                + (testParam.isPresent()? " and (v.cTranAmt between :fromAmount and :toAmount) ":"")
-                + (testParam.isPresent()? " and (v.cTranDate between :fromDate and :toDate)) ":"")
-                + (testParam.isPresent()? " and (v.cRefNum=:transactionId)   ":"")
-                + (testParam.isPresent()? " and (trunc(v.cPostingDate) between :fromPostingDate and :toPostingDate) ":"")
-                + (testParam.isPresent()? " and (v.cTranType=:transType) ":"")
-                + (testParam.isPresent()? " and (v.terminalId=:terminalId) ":"")
-                + (testParam.isPresent()? " and (v.cAuthCode=:authCode) ":"")
-
-                + "    and (  (:code='cInstrumentSubtypeCode' and v.cInstrumentSubtypeCode=d.code)"
-                + "           or  (:code='cIssuerLocation' and v.cIssuerLocation=d.code)"
-                + "           or  (:code='cTranSourceCode' and v.cTranSourceCode=d.code) "
-                + "           or  (:code='cProcessingStatusCode' and v.cProcessingStatusCode=d.code ) "
-                + "    or  (:code='cTranType' and v.cTranType=d.code) "
-                + "           or  (:code='cDccIndicator' and v.cDccIndicator=d.code) "
-                + "           or  (:code='cInstrumentTypeCode' and v.cInstrumentTypeCode=d.code)"
-                + "           or  (:code='cUcafeciCode' and v.cUcafeciCode=d.code)"
-                + "     or not exists (SELECT 1 FROM Dictionary d1 WHERE cat =:category"
-                + "           AND LANGUAGE_CODE=:langCode AND ALLIANCE_CODE=:allianceCode AND ((:code='cProcessingStatusCode' and v.cProcessingStatusCode=d1.code)"
-                + " or(:code='cInstrumentSubtypeCode' and v.cInstrumentSubtypeCode=d1.code) "
-                + " or(:code='cIssuerLocation' and v.cIssuerLocation=d1.code)or(:code='cTranSourceCode' and v.cTranSourceCode=d1.code)"
-                + " or(:code='cTranType' and v.cTranType=d1.code) or (:code='cDccIndicator' and v.cDccIndicator=d1.code) "
-                + " or (:code='cInstrumentTypeCode' and v.cInstrumentTypeCode=d1.code) or (:code='cUcafeciCode' and v.cUcafeciCode=d1.code))) "
-                + " and (d.code='DUMMY_CODE'))"
-
-                + " and (:transSourceCd is null  or (v.cTranSourceCode=:transSourceCd)) "
-                + " and (:status is null  or (v.cProcessingStatusCode=:status) )  "
-                + " and (:transCurrCode is null  or (v.cTranCurrCode=:transCurrCode)) "
-                + " and (:eMid is null or (v.mExternalMerchId=:eMid)) order By coalesce(d.name "
-                + " ,CASE :code "
-                + " when 'cProcessingStatusCode' then v.cProcessingStatusCode "
-                + "  when 'cInstrumentSubtypeCode' then v.cInstrumentSubtypeCode     "
-                + "  when 'cIssuerLocation' then v.cIssuerLocation "
-                + "  when 'cTranSourceCode' then v.cTranSourceCode "
-                + "  when 'cTranType' then v.cTranType "
-                + "  when 'cDccIndicator' then v.cDccIndicator "
-                + "  when 'cInstrumentTypeCode' then v.cInstrumentTypeCode "
-                + "  when 'cUcafeciCode' then v.cUcafeciCode END) ";
 	}
 
 }
